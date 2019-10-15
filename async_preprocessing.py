@@ -128,7 +128,7 @@ def main_multi_task(args):
     pool.join()
 
     data_ds.finalize(data_idx)
-    print("| write data into {}".format(args.outs))
+    print("| write data into {}".format(args.out))
 
 
 if __name__ == "__main__":

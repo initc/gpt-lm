@@ -19,19 +19,15 @@ DISTRIBUTED_ARGS="--nproc_per_node $WORLD_SIZE --nnodes $NNODES --node_rank $NOD
 
 python -m torch.distributed.launch $DISTRIBUTED_ARGS \
     pretrain_bert.py \
-    # --load-model \
-    # --strict \
-    # --fix-model-state \
-    # --load  $LOAD_MODEL \
     --model-config  $MODEL_CONFIG\
     --data   $DATA\
     --train-prefix train-CLM \
     --valid-prefix valid-CLM \
-    --valid-interval 5000 \
-    --max-tokens 4000 \
+    --valid-interval 100 \
+    --max-tokens 1000 \
     --max-lens 512 \
     --train-batch 4 \
-    --valid-batch 4
+    --valid-batch 4  \
     --log-interval 1 \
     --multi-doc \
     --no-cache \

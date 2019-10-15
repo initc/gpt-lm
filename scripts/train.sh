@@ -9,20 +9,20 @@ MODEL_CONFIG="model-config/"
 # LOAD_MODEL="checkpoints/multi-task-gpt/checkpoints-best.pt"
 SAVE_PT="checkpoints/gpt-test"
 
+# --load-model \
+# --strict \
+# --fix-model-state \
+# --load  $LOAD_MODEL \
 python pretrain_bert.py \
-    # --load-model \
-    # --strict \
-    # --fix-model-state \
-    # --load  $LOAD_MODEL \
     --model-config  $MODEL_CONFIG\
     --data   $DATA\
     --train-prefix train-CLM \
     --valid-prefix valid-CLM \
     --valid-interval 5000 \
-    --max-tokens 4000 \
+    --max-tokens 1000 \
     --max-lens 512 \
     --train-batch 4 \
-    --valid-batch 4
+    --valid-batch 4  \
     --log-interval 1 \
     --multi-doc \
     --no-cache \
