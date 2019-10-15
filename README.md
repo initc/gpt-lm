@@ -11,7 +11,8 @@ pip install -r requirements.txt
 
 
 # Usage
-##准备你的训练数据
+
+## 准备你的训练数据
 
 在代码主目录下，提供了两个小的测试文件，tmp_data/train.txt和tmp_data/valid.txt,分别对应着训练数据和验证数据。你可以把这两个文件替换成你要训练的数据。
 
@@ -70,7 +71,7 @@ python pretrain_bert.py \
     --num-workers 2 \
 ```
 
-## ###多卡GPU训练
+### 多卡GPU训练
 `bash scripts/distributed_train.sh`
 
 `WORLD_SIZE`指定GPU的个数，`MASTER_ADDR 和 MASTER_PORT`通讯协议，`NNODES`多机训练，一般设为1
