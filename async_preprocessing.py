@@ -85,6 +85,49 @@ def read_split(
     return result
 
 
+def merge_multi_line(
+        filename, tokenizer, worker_id, num_workers, type_doc, min_lens=10
+    ):
+    with open(filename, 'r') as f:
+        size = os.fstat(f.fileno()).st_size
+        chunk_size = size // num_workers
+        offset = worker_id * chunk_size
+        end = offset + chunk_size
+        eos_id = tokenizer.eos()
+        f.seek(offset)
+        if offset > 0:
+            safe_readline(f)  # drop first incomplete line
+        result = []
+        line = f.readline()
+        tmp_ids = []
+        while line:
+            line = replace_text(line)
+            ids = tokenizer.convert_text_to_ids(line)+[eos_id]
+            # tmp_ids.extend(ids)
+            if len(tmp_ids) + len(ids) > 511:
+                ids_cur = tmp_ids[:511]
+                if ids_cur[0] == eos_id:
+                    ids_cur[0] = type_doc
+                else:
+                    ids_cur = [type_doc] + ids_cur
+                if ids_cur[-1] == eos_id:
+                    ids_cur.pop()
+                ids_cur = ids_cur[:511]
+                result.append(ids_cur)
+                tmp_ids = tmp_ids[511:]
+                if len(tmp_ids) + len(ids) < 511:
+                    tmp_ids += ids
+                else:
+                    tmp_ids = ids[-511:]
+            else:
+                tmp_ids.extend(ids)
+
+            if f.tell() > end:
+                break
+            line = f.readline()
+    return result
+
+
 def main_multi_task(args):
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -94,6 +137,7 @@ def main_multi_task(args):
     parser.add_argument("--out", type=str, help="output path")
     parser.add_argument("--prefix", type=str, default="train")
     parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--task", type=str, choices=['single', 'multi'], default="single")
     args = parser.parse_args(args)
 
 
@@ -109,10 +153,13 @@ def main_multi_task(args):
             )
     pool = Pool(processes=args.workers)
     worker_result = []
-
+    if args.task == "single":
+        handle_func = read_split
+    elif args.task == "multi":
+        handle_func = merge_multi_line
     for i in range(args.workers):
         w = pool.apply_async(
-                    read_split,
+                    handle_func,
                     (
                         args.data,
                         tokenizer,

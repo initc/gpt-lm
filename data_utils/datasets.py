@@ -128,8 +128,8 @@ class CLMTaskDataset(data.Dataset):
                 return False
             if num_tokens > max_tokens:
                 return True
-            # if len(batch) == self.batch_size:
-            #     return True
+            if len(batch) == self.batch_size:
+                return True
             return False
 
         for idx in indices:
